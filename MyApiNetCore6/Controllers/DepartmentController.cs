@@ -35,7 +35,6 @@ namespace MyApiNetCore6.Controllers
         }
 
         [HttpGet("{Department_ID}")]
-       
         public async Task<IActionResult> GetDepartmentByID(int Department_ID)
         {
             try
