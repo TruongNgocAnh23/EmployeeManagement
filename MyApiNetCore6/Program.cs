@@ -31,6 +31,8 @@ builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IRegularPaymentRepository, RegularPaymentRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IManagerFunctionsRepository, ManagerFunctionsRepository>();
+builder.Services.AddScoped<IHRFunctionsRepository, HRFunctionsRepositorycs>();
 
 builder.Services.AddAuthentication(options => { 
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

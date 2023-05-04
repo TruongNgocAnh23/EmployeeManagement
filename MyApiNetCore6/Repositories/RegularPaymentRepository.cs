@@ -48,22 +48,40 @@ namespace MyApiNetCore6.Repositories
       
         public async Task<int> AddRegularPaymentAsync(RegularPayment_Model model)
         {
+            if (model.RegularPaymentPerHour <= 0)
+            {
+                return 1;
+            }
+
             var CheckDepartment = _context.Departments.SingleOrDefault(p => p.Department_ID == model.Department_ID);
             if (CheckDepartment != null)
             {
-                var newRegularPament = _mapper.Map<RegularPayment>(model);
-                _context.RegularPayment!.Add(newRegularPament);
-                await _context.SaveChangesAsync();
-                return newRegularPament.RegularPayment_ID;
+                var CheckID = _context.RegularPayment.SingleOrDefault(p => p.RegularPayment_ID == model.RegularPayment_ID);
+                if (CheckID == null)
+                {
+                    var newRegularPament = _mapper.Map<RegularPayment>(model);
+                    _context.RegularPayment!.Add(newRegularPament);
+                    await _context.SaveChangesAsync();
+                    return 0;
+                } 
+                else
+                {
+                    return 3;
+                }    
+               
             }
             else
             {
-                return 0;
+                return 2;
             }    
         }
 
         public async Task<int> UpdateRegularPaymentAsync(RegularPayment_Model model)
         {
+            if (model.RegularPaymentPerHour <= 0)
+            {
+                return 1;
+            }
             var Update = _context.RegularPayment!.FirstOrDefault(p => p.RegularPayment_ID == model.RegularPayment_ID);
             if (Update != null)
             {

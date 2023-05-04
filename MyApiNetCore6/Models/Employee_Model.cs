@@ -25,4 +25,14 @@ namespace MyApiNetCore6.Models
         public bool Is_Manager { get; set; }
         public bool Is_Register { get; set; }
     }
+    public class ChangePassword_Model
+    {
+        public int Employee_ID { get; set; }
+        public string Pass { get; set; }
+    }
+    public class SetManager_Model
+    {
+        public int Employee_ID { get; set; }
+        public bool Is_Manager { get; set; }
+    }
 }

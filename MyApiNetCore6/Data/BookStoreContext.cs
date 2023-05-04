@@ -15,6 +15,7 @@ namespace MyApiNetCore6.Data
         public DbSet<Department>? Departments { get; set; }
         public DbSet<RegularPayment>? RegularPayment { get; set; }
         public DbSet<Employee>? Employee { get; set; }
+        public DbSet<TimeSheet>? Timesheet { get; set; }
         #endregion
     }
 }

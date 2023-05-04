@@ -21,7 +21,7 @@ namespace MyApiNetCore6.Controllers
         {
             _departmentRepo = repo;
         }
-        [HttpGet]
+        [HttpGet("GetList")]
         public async Task<IActionResult> GetAllDepartments()
         {
             try
@@ -34,7 +34,7 @@ namespace MyApiNetCore6.Controllers
             }
         }
 
-        [HttpGet("{Department_ID}")]
+        [HttpGet("GetDepartmentBy{Department_ID}")]
         public async Task<IActionResult> GetDepartmentByID(int Department_ID)
         {
             try
@@ -47,40 +47,63 @@ namespace MyApiNetCore6.Controllers
                 return BadRequest();
             }
         }
-        [HttpPost]
+        [HttpPost("AddNew")]
         public async Task<IActionResult> AddDepartment(Department_Model model)
         {
             try
             {
                 var newDepartment_ID = await _departmentRepo.AddDepartmentAsync(model);
-                var department = await _departmentRepo.GetDepartmentAsync(newDepartment_ID);
-                return department == null ? NotFound() : Ok(department);
+                switch (newDepartment_ID)
+                {
+                    case 1:
+                        return Ok("Department_ID already exists");
+                        break;
+                    default:
+                        return Ok("Success");
+                        break;
+                }
             }
             catch
             {
                 return BadRequest();
             }
         }
-        [HttpPut]
+        [HttpPut("Update")]
         public async Task<IActionResult> UpdateDepartment(Department_Model model)
         {
             try
             {
-                await _departmentRepo.UpdateDepartmentAsync(model);
-                return Ok("Success!");
+                var Update = await _departmentRepo.UpdateDepartmentAsync(model);
+                switch (Update)
+                {
+                    case 1:
+                        return Ok("Doesn't exist Department_ID = " + model.Department_ID);
+                        break;
+                    default:
+                        return Ok("Success");
+                        break;
+                }
             }
             catch
             {
                 return BadRequest();
             }
         }
-        [HttpDelete("{Department_ID}")]
+        [HttpDelete("Delete{Department_ID}")]
         public async Task<IActionResult> DeleteDepartment(int Department_ID)
         {
             try
             {
-                await _departmentRepo.DeleteDepartmentAsync(Department_ID);
-                return Ok("Success!");
+               var Dele = await _departmentRepo.DeleteDepartmentAsync(Department_ID);
+                switch (Dele)
+                {
+                    case 1:
+                        return Ok("Doesn't exist Department_ID = " + Department_ID);
+                        break;
+                    default:
+                        return Ok("Success");
+                        break;
+                }    
             }
             catch
             {

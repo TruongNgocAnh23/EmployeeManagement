@@ -11,7 +11,6 @@ namespace MyApiNetCore6.Repositories
     {
         private readonly BookStoreContext _context;
         private readonly IMapper _mapper;
-        private const int Result = 0;
         public EmployeeRepository(BookStoreContext context, IMapper mapper)
         {
             _context = context;
@@ -103,11 +102,22 @@ namespace MyApiNetCore6.Repositories
 
         public async Task<int> RegisterAsync(Employee_Model model)
         {
+            if (model.Gender > 3 || model.Gender < 0)
+            {
+                return 5;
+            }
+            var CheckDepartment = _context.Departments.SingleOrDefault(p => p.Department_ID == model.Department_ID);
+            if (CheckDepartment == null)
+            {
+                return 6;
+            }    
             var CheckEm = _context.Employee.SingleOrDefault(p => p.Department_ID == model.Department_ID & p.Name == model.Name);
             if (CheckEm == null)
             {
+                // Password length > 6 characters?
                 if (model.Pass.Length >= 6)
                 {
+                    //Password have at least  a number character?
                     var b = String.Empty;
                     for (int i = 0; i < model.Pass.Length; i++)
                     {
@@ -116,6 +126,7 @@ namespace MyApiNetCore6.Repositories
                     }
                     if (b.Length > 0)
                     {
+                        //Password have at least a special character?
                         var withoutSpecial = new string(model.Pass.Where(c => Char.IsLetterOrDigit(c)
                                             || Char.IsWhiteSpace(c)).ToArray());
                         if (model.Pass != withoutSpecial)
@@ -123,12 +134,11 @@ namespace MyApiNetCore6.Repositories
                             var newEm = _mapper.Map<Employee>(model);
                             _context.Employee.Add(newEm);
                             await _context.SaveChangesAsync();
-                            return newEm.Employee_ID;
+                            return 0;
                         }
                         else
                         {
                             return 3;
-
                         }    
                       
                     }
@@ -141,18 +151,121 @@ namespace MyApiNetCore6.Repositories
                 {
                     return 1;
                 }    
-               
-                
             }
             else
             {
-                return Result;
+                return 4;
             }
         }
 
-        public Task<int> UpdateEmployeeeAsync(Employee_Model model)
+        public async Task<int> UpdateEmployeeeAsync(ChangePassword_Model model)
         {
-            throw new NotImplementedException();
+            var CheckEm = _context.Employee.SingleOrDefault(p => p.Employee_ID == model.Employee_ID);
+            if (CheckEm != null)
+            {
+                if (model.Pass.Length >= 6)
+                {
+                    //Password have at least  a number character?
+                    var b = String.Empty;
+                    for (int i = 0; i < model.Pass.Length; i++)
+                    {
+                        if (Char.IsDigit(model.Pass[i]))
+                            b += model.Pass[i];
+                    }
+                    if (b.Length > 0)
+                    {
+                        //Password have at least a special character?
+                        var withoutSpecial = new string(model.Pass.Where(c => Char.IsLetterOrDigit(c)
+                                            || Char.IsWhiteSpace(c)).ToArray());
+                        if (model.Pass != withoutSpecial)
+                        {
+                            CheckEm.Pass = model.Pass;
+                            await _context.SaveChangesAsync();
+                            return 0;
+                        }
+                        else
+                        {
+                            return 3;
+                        }
+                    }
+                    else
+                    {
+                        return 2;
+                    }
+                }
+                else
+                {
+                    return 1;
+                }
+            }    
+            else
+            {
+                return 4;
+            }    
+        }
+
+        public async Task<int> CheckInAsync(CheckIn_Model model)
+        {
+            if (model.CheckIn.ToString() == "" || model.CheckIn == null)
+            {
+                return 3;
+            }    
+            var CheckEm = _context.Employee.SingleOrDefault(p => p.Employee_ID == model.Employee_ID);
+            if (CheckEm != null)
+            {
+                var CheckTime = _context.Timesheet.SingleOrDefault(p => p.CheckIn.Value.Day == model.CheckIn.Value.Day & p.CheckIn.Value.Month == model.CheckIn.Value.Month & p.CheckIn.Value.Year == model.CheckIn.Value.Year & p.Employee_ID == model.Employee_ID);
+                if (CheckTime == null)
+                {
+                    var Check = new TimeSheet();
+                    Check.Employee_ID = model.Employee_ID;
+                    Check.CheckIn = model.CheckIn;
+                    Check.CreateBy = model.Employee_ID;
+                    Check.CreateDate = DateTime.Now;
+                    _context.Timesheet!.Add(Check);
+                    await _context.SaveChangesAsync();
+                    return 0;
+                }
+                else
+                {
+                    return 2;
+                }    
+            }    
+            else
+            {
+                return 1;
+            }    
+        }
+        public async Task<int> CheckOutAsync(CheckOut_Model model)
+        {
+            if (model.CheckOut.ToString() == "" || model.CheckOut == null)
+            {
+                return 2;
+            }
+            var CheckEm = _context.Timesheet.SingleOrDefault(p => p.TimeSheet_ID == model.TimeSheet_ID);
+            if (CheckEm != null)
+            {
+                CheckEm.CheckOut = model.CheckOut;
+                await _context.SaveChangesAsync();
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+        public async Task<int> SetManagerAsync(SetManager_Model model)
+        {
+            var CheckEm = _context.Employee.SingleOrDefault(p => p.Employee_ID == model.Employee_ID);
+            if (CheckEm != null)
+            {
+                CheckEm.Is_Manager = model.Is_Manager;
+                await _context.SaveChangesAsync();
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
         }
     }
 }
