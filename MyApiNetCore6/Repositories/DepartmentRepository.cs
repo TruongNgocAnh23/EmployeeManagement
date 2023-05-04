@@ -17,19 +17,33 @@ namespace MyApiNetCore6.Repositories
         }
         public async Task<int> AddDepartmentAsync(Department_Model model)
         {
-            var newDepartment = _mapper.Map<Department>(model);
-            _context.Departments!.Add(newDepartment);
-            await _context.SaveChangesAsync();
-            return newDepartment.Department_ID;
+            var Check = _context.Departments.SingleOrDefault(p => p.Department_ID == model.Department_ID);
+            if (Check == null)
+            {
+                var newDepartment = _mapper.Map<Department>(model);
+                _context.Departments!.Add(newDepartment);
+                await _context.SaveChangesAsync();
+                return 0;
+            }    
+            else
+            {
+                return 1;
+            }    
+           
         }
 
-        public async Task DeleteDepartmentAsync(int Department_ID)
+        public async Task<int> DeleteDepartmentAsync(int Department_ID)
         {
             var deleteDepartment = _context.Departments!.SingleOrDefault(p => p.Department_ID == Department_ID);
             if (deleteDepartment != null)
             {
                 _context.Departments.Remove(deleteDepartment);
                 await _context.SaveChangesAsync();
+                return 0;
+            }  
+            else
+            {
+                return 1;
             }    
         }
 
@@ -45,14 +59,20 @@ namespace MyApiNetCore6.Repositories
             return _mapper.Map<Department_Model>(department);
         }
 
-        public async Task UpdateDepartmentAsync(Department_Model model)
+        public async Task<int> UpdateDepartmentAsync(Department_Model model)
         {
             var check = _context.Departments.FirstOrDefault(p => p.Department_ID == model.Department_ID);
             if (check != null)
             {
+                var a = 
                 check.Department_Name = model.Department_Name;
                 await _context.SaveChangesAsync();
+                return 0;
             }
+            else
+            {
+                return 1;
+            }    
         }
        
     }

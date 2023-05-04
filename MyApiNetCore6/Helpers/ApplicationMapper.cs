@@ -10,6 +10,9 @@ namespace MyApiNetCore6.Helpers
         {
             CreateMap<Book, BookModel>().ReverseMap();
             CreateMap<Department, Department_Model>().ReverseMap();
+            CreateMap<RegularPayment, RegularPayment_Model>().ReverseMap();
+            CreateMap<RegularPaymentList, RegularPaymentList_Model>().ReverseMap();
+            CreateMap<Employee, Employee_Model>().ReverseMap();
         }
     }
 }
